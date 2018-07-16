@@ -111,6 +111,15 @@ class Game:
 
         return None
 
+    def check_draw(self):
+        """Checks for draw"""
+        board_size = self.size[0] * self.size[1]
+        if self.checked_count == board_size:
+            print("The game is a draw.")
+            return True
+        else:
+            return False
+
     def draw_board(self):
         """Draws all rectangles from tiles"""
         for x in range(0, self.size[0]):
@@ -137,6 +146,8 @@ class Game:
         played = tile.play(self.next_player_index, player)
 
         if played:
+            self.checked_count += 1
+            self.check_draw()
             self.check_win(np.array(position), self.next_player_index)
             self.cycle_players()
 
