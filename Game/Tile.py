@@ -1,5 +1,6 @@
 import random
 from pygame import Rect
+from Game.Colors import *
 
 
 class Tile:
@@ -37,17 +38,18 @@ class Tile:
             return self.value == (0, 1)
         return False
 
-    def play(self, player_index, player):
+    def play(self, player_index):
         """Mark the tile as played. Do nothing if already played."""
         if self.was_played():
             return False
 
         if player_index == 0:
             self.value = (1, 0)
+            self.tile_color = RED
         elif player_index == 1:
             self.value = (0, 1)
+            self.tile_color = BLUE
 
-        self.tile_color = player.color
         return True
 
     def was_hit(self, mouse_position):

@@ -1,5 +1,6 @@
 class Line:
     """Represents a line on the tictactoe board"""
+
     def __init__(self, start, end, score):
         """
         :type start: np.array
