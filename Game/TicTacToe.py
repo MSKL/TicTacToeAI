@@ -1,7 +1,6 @@
 from Game.GameState import GameState
 from Game.Colors import *
 import pygame
-import numpy as np
 
 
 class Game:
@@ -15,16 +14,16 @@ class Game:
 
         # Setup the PyGame
         pygame.init()
+        pygame.display.set_caption("Tic Tac Toe AI")
         self.window_size = [(size[0]) * square_size, (size[1]) * square_size]
         self.screen = pygame.display.set_mode(self.window_size)
         self.screen.fill(WHITE)
-        pygame.display.set_caption("Tic Tac Toe AI")
 
         # Draw empty board
         self.draw_board()
         self.draw_lines()
 
-        # Red player starts
+        # Index of the next player that will play
         self.next_player_index = 0
 
         # If the game has ended with win or draw
@@ -54,28 +53,26 @@ class Game:
         """Switches to the next player's index"""
         self.next_player_index = (self.next_player_index + 1) % 2
 
-    def loop_tick(self):
-        """One tick of the main game loop"""
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return True
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = event.pos
-                for x in range(0, self.size[0]):
-                    for y in range(0, self.size[1]):
-                        tile = self.board.tiles[x][y]
-                        if tile.was_hit(mouse_pos):
-                            self.board.play(position=(x, y), player_id=self.next_player_index)
-                            self.cycle_players()
-
-        # Flip the display after possible update
-        self.draw_board()
-        self.draw_lines()
-        pygame.display.flip()
-        return False
-
     def game_loop(self):
         """The main game loop"""
         done = False
         while not done:
-            done = self.loop_tick()
+            """One tick of the main game loop"""
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = event.pos
+                    for x in range(0, self.size[0]):
+                        for y in range(0, self.size[1]):
+                            tile = self.board.tiles[x][y]
+
+                            # If user clicked a tile
+                            if tile.was_hit(mouse_pos):
+                                self.board.play(position=(x, y), player_id=self.next_player_index)
+                                self.cycle_players()
+
+            self.draw_board()
+            self.draw_lines()
+            pygame.display.flip()

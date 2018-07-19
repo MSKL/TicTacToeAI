@@ -8,22 +8,18 @@ class GameState:
         """Initialise a tile and create rectangles"""
         self.size = size
         self.win_len = win_len
-
-        # Initialise the tile array
+        self.checked_count = 0
         self.tiles = [size[0] * [None] for i in range(size[1])]
 
         # Lines contain the winning streaks
         self.lines = []
 
-        # Checked count
-        self.checked_count = 0
-
-        # Todo: check the weird indexing
+        # Initialise all tiles as empty tiles
         for x in range(0, size[0]):
             for y in range(0, size[1]):
                 self.tiles[x][y] = Tile((x, y), square_size, (0, 0))
 
-        # The tile that was last played is used for checking of the game state
+        # The tile that was last played is used for checking of the game state - win,..
         self.last_played_tile = None
 
     def tile_at_pos(self, position):
@@ -47,6 +43,7 @@ class GameState:
         # Copy the mutable array
         pos = pos.copy()
 
+        # Traverse to the end and count the steps
         count = 0
         while True:
             if self.tile_in_bounds(tuple(pos)):
@@ -69,29 +66,36 @@ class GameState:
         :param player_id: id of the player
         :return: Line with score
         """
-        score1, line_start = self.find_axis_end(position, axis, player_id)
-        axis *= -1  # Reverse axis
-        score2, line_end = self.find_axis_end(position, axis, player_id)
 
+        # Go to the both ends of the axis
+        score1, line_start = self.find_axis_end(position, axis, player_id)
+        score2, line_end = self.find_axis_end(position, axis * -1, player_id)
+
+        # Omit the current square that is calculated twice
         score = score1 + score2 - 1
         return Line(line_start, line_end, score)
 
     def best_line_after_move(self, position, player_id):
-        """Get the score after move"""
+        """Get the score after move. NP arrays are used as a vector"""
         maximum = Line(np.array([0, 0]), np.array([0, 0]), 0)
         # - check
         maximum = max(maximum, self.check_axis(position, np.array([1, 0]), player_id))
-        print("horizontal start ({0}, {1})".format(maximum.start[0], maximum.start[1]))
-        print("horizontal end ({0}, {1})".format(maximum.end[0], maximum.end[1]))
         # | check
         maximum = max(maximum, self.check_axis(position, np.array([0, 1]), player_id))
         # / check
         maximum = max(maximum, self.check_axis(position, np.array([1, 1]), player_id))
         # \ check
-        return max(maximum, self.check_axis(position, np.array([1, -1]), player_id))
+        maximum = max(maximum, self.check_axis(position, np.array([1, -1]), player_id))
+        # Return the best fit
+        return maximum
 
     def check_win(self, position, player_id):
-        """:returns 0/1 => player0/1 won, 2 => draw, None => anything else"""
+        """Checks if any of the players won or the game has ended with draw.
+        None => The game is undecided
+        0 => player 0 won
+        1 => player 1 won
+        2 => draw
+        """
         line = self.best_line_after_move(position, player_id)
 
         if line.score >= self.win_len:
@@ -101,7 +105,8 @@ class GameState:
         elif (self.size[0] * self.size[1]) == self.checked_count:
             print("The game has ended with draw.")
             return 2
-        return None
+        else:
+            return None
 
     def play(self, position, player_id):
         """Tick a square and check, if it is valid"""
