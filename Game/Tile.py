@@ -39,9 +39,9 @@ class Tile:
         return False
 
     def play(self, player_index):
-        """Mark the tile as played. Do nothing if already played."""
+        """Mark the tile as played."""
         if self.was_played():
-            return False
+            raise Exception("The tile was already played. Error in checking.")
 
         if player_index == 0:
             self.value = (1, 0)
@@ -49,8 +49,6 @@ class Tile:
         elif player_index == 1:
             self.value = (0, 1)
             self.tile_color = BLUE
-
-        return True
 
     def was_hit(self, mouse_position):
         """Check if the tile was hit by mouse"""
