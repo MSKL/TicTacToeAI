@@ -19,9 +19,10 @@ class Game:
         self.screen = pygame.display.set_mode(self.window_size)
         self.screen.fill(WHITE)
 
-        # Draw empty board
-        self.draw_board()
-        self.draw_lines()
+        # Setup the text
+        pygame.font.init()
+        self.information_text = "Scio me nihil scire."
+        self.my_font = pygame.font.SysFont("helvetica", 16)
 
         # Index of the next player that will play
         self.next_player_index = 0
@@ -49,6 +50,11 @@ class Game:
 
             pygame.draw.line(self.screen, BLACK, real_start, real_end, 10)
 
+    def draw_text(self):
+        """Draws the text information to the screen"""
+        textsurface = self.my_font.render(self.information_text, True, (0, 0, 0))
+        self.screen.blit(textsurface, (10, 10))
+
     def cycle_players(self):
         """Switches to the next player's index"""
         self.next_player_index = (self.next_player_index + 1) % 2
@@ -56,23 +62,34 @@ class Game:
     def game_loop(self):
         """The main game loop"""
         done = False
+
+        # One tick of the main game loop
         while not done:
-            """One tick of the main game loop"""
             for event in pygame.event.get():
+                # On the application closed
                 if event.type == pygame.QUIT:
                     done = True
 
+                # On user clicked the screen
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = event.pos
                     for x in range(0, self.size[0]):
                         for y in range(0, self.size[1]):
-                            tile = self.board.tiles[x][y]
 
                             # If user clicked a tile
+                            tile = self.board.tiles[x][y]
                             if tile.was_hit(mouse_pos):
-                                self.board.play(position=(x, y), player_id=self.next_player_index)
+
+                                # Played returns a number if the game has ended
+                                played = self.board.play(position=(x, y), player_id=self.next_player_index)
+                                if played is not None:
+                                    if played == 0 or played == 1:
+                                        self.information_text = "Player ID {0} won!".format(played)
+                                    elif played == 2:
+                                        self.information_text = "The game has ended with draw."
                                 self.cycle_players()
 
             self.draw_board()
             self.draw_lines()
+            self.draw_text()
             pygame.display.flip()

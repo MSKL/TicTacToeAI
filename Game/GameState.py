@@ -100,11 +100,11 @@ class GameState:
         line = self.__best_line_after_move(position, player_id)
 
         if line.score >= self.win_len:
-            print("Player ID {0} won!".format(player_id))
+            # print("Player ID {0} won!".format(player_id))
             self.lines.append(line)
             return player_id
         elif (self.size[0] * self.size[1]) == self.checked_count:
-            print("The game has ended with draw.")
+            # print("The game has ended with draw.")
             return 2
         else:
             return None
@@ -117,4 +117,4 @@ class GameState:
             self.last_played_tile = tile
             self.last_played_tile.play(player_id)
             self.checked_count += 1
-            self.check_win(np.array(position), player_id)
+            return self.check_win(np.array(position), player_id)
