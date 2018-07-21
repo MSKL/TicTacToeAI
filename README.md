@@ -8,4 +8,4 @@ A simple game written in Python3 and PyGame to teach me the game theory MinMax a
 - [x] Make visualisation (draw black lines over the winning line)
 - [ ] Make an algorithm to check and count all possible states the game can end in
 - [ ] Write the MinMax algorithm
-- [ ] Add Alfa/Beta branching to further speed up the MM algorithm
+- [ ] Add Alfa/Beta prunning to further speed up the MM algorithm
